@@ -11,20 +11,8 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import co.edu.uniandes.csw.auth.conexions.AuthenticationApi;
-import com.google.gson.Gson;
-import com.google.gson.JsonElement;
-import com.mashape.unirest.http.exceptions.UnirestException;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.concurrent.ExecutionException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import org.json.JSONException;
-import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
 /**
  *
  * @author Asistente
@@ -60,32 +48,7 @@ public class PostmanTestBuilder {
     requests_failed=null;
     }
       
-     public void setTestWithLogin(String collectionName,String environmentName) throws IOException{
-     
-        if(path.validateDir())
-       for(File f : path.getFiles()){
-           cb = new CollectionBuilder(f);
-          if(cb.isEnvironment(environmentName))       
-                   try {
-                       loginCredentials(f);
-                           env = env.concat(path.getPATH().concat("\\").concat(cb.getOriginalName()+" --disable-unicode"));
-           } catch (FileNotFoundException | ParseException | UnirestException | JSONException | InterruptedException | ExecutionException ex) {
-               Logger.getLogger(PostmanTestBuilder.class.getName()).log(Level.SEVERE, null, ex);
-           }
-          if(cb.isCollection(collectionName)){  
-             coll = coll.concat(path.getPATH().concat("\\").concat(cb.getOriginalName()));
-          }//    else
-        //      throw new IOException();
-       }
-        tmp = File.createTempFile(collectionName, ".bat");
-        
-        bw = new BufferedWriter(new FileWriter(tmp));
-    	    bw.write(coll.concat(env));
-            bw.close();
-            tmp.setExecutable(true);
-            startProcess();
-    }
-     
+    
      public void setTestWithoutLogin(String collectionName) throws IOException{
      
         if(path.validateDir())
@@ -170,33 +133,6 @@ public class PostmanTestBuilder {
         }       
     tmp.deleteOnExit();
     }
- 
- public static void loginCredentials(File f) throws FileNotFoundException, IOException, ParseException, UnirestException, JSONException, InterruptedException, ExecutionException{
-
-        AuthenticationApi api = new AuthenticationApi();
-   JSONParser parser;
-        parser = new JSONParser();
-   Gson gson = new Gson();
-   Object obj;
-       try (FileReader fr = new FileReader(f.getAbsolutePath())) {
-           obj = parser.parse(fr);
-            fr.close();
-       }
-        JsonElement je = gson.toJsonTree(obj);
-        je.getAsJsonObject()
-                .get("values").getAsJsonArray()
-                .get(0).getAsJsonObject().addProperty("value", api.getProp().getProperty("username"));
-        je.getAsJsonObject()
-                .get("values").getAsJsonArray()
-                .get(1).getAsJsonObject().addProperty("value", api.getProp().getProperty("password"));
-                
-       FileWriter fw = new FileWriter(f.getAbsolutePath());
-       fw.write(je.toString());
-       fw.flush();
-       fw.close();
-
-    }
-
     /**
      * @return the requests_failed
      */
