@@ -11,7 +11,7 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import co.edu.uniandes.csw.auth.conexions.AuthenticationApi;
+import co.edu.uniandes.csw.auth.api.AuthenticationApi;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.mashape.unirest.http.exceptions.UnirestException;
