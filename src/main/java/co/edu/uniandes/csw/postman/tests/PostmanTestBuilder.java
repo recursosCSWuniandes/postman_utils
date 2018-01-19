@@ -93,6 +93,8 @@ public class PostmanTestBuilder {
            cb = new CollectionBuilder(f);
            if(cb.isCollection(collectionName)){   
              coll = coll.concat(path.getPATH().concat("\\").concat(cb.getOriginalName()));
+             System.out.println("comando y ruta de ejecucion");
+             System.out.println(coll);
            }// else {
             //  throw new IOException();
           // }
