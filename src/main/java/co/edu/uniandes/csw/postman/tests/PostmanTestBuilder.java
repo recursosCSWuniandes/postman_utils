@@ -56,9 +56,9 @@ public class PostmanTestBuilder {
            cb = new CollectionBuilder(f);
            if(cb.isCollection(collectionName)){      
              coll = coll.concat(path.getPATH().concat("\\").concat(cb.getOriginalName()));
-           } else {
-              throw new IOException();
-           }
+           } /* else {
+             throw new IOException();
+           } */
        }
         tmp = File.createTempFile(collectionName, ".bat");
         bw = new BufferedWriter(new FileWriter(tmp));
