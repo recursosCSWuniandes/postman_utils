@@ -87,17 +87,25 @@ public class PostmanTestBuilder {
     }
      
      public void setTestWithoutLogin(String collectionName) throws IOException{
-     
-        if(path.validateDir())
+     int fileCount = path.getFiles().length;
+             
+        if(path.validateDir() && fileCount > 0)
        for(File f : path.getFiles()){
+           
            cb = new CollectionBuilder(f);
            if(cb.isCollection(collectionName)){   
              coll = coll.concat(path.getPATH().concat("\\").concat(cb.getOriginalName()));
              System.out.println("comando y ruta de ejecucion");
              System.out.println(coll);
-           }// else {
-            //  throw new IOException();
-          // }
+             fileCount--;
+           } else {
+              if(fileCount == 0)
+                  try{
+                  throw new IOException();
+                  }catch(IOException ie){
+                  System.out.println(ie.getMessage()+" no se encontro archivo: "+coll);    
+                  }
+           }
        }
         tmp = File.createTempFile(collectionName, ".bat");
         bw = new BufferedWriter(new FileWriter(tmp));
@@ -105,6 +113,7 @@ public class PostmanTestBuilder {
             bw.close();
             tmp.setExecutable(true);
             startProcess();
+            
     }
      
       public void setTestWithoutLogin(String collectionName,String environmentName) throws IOException{
