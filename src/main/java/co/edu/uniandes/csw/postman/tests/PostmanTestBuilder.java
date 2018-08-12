@@ -4,6 +4,7 @@
  * and open the template in the editor.
  */
 package co.edu.uniandes.csw.postman.tests;
+
 import co.edu.uniandes.csw.postman.utils.CollectionBuilder;
 import co.edu.uniandes.csw.postman.utils.PathBuilder;
 import java.io.BufferedReader;
@@ -13,11 +14,15 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.logging.Logger;
+
 /**
  *
  * @author Asistente
  */
 public class PostmanTestBuilder {
+
+    private static final Logger LOGGER = Logger.getLogger(PostmanTestBuilder.class.getName());
     private String env;
     private String coll;
     private PathBuilder path;
@@ -34,105 +39,115 @@ public class PostmanTestBuilder {
     private String prerequest_scripts_failed;
     private File tmp;
     private BufferedWriter bw;
-    
-    public PostmanTestBuilder(){
-    path = new PathBuilder();
-    env = " -e ";
-    coll = "newman run ";
-    line = "";
-    ln = null;
-    prerequest_scripts_failed=null;
-    test_scripts_failed=null;
-    assertions_failed=null;
-    iterations_failed=null;
-    requests_failed=null;
+
+    public PostmanTestBuilder() {
+        path = new PathBuilder();
+        env = " -e ";
+        coll = "newman run ";
+        line = "";
+        ln = null;
+        prerequest_scripts_failed = null;
+        test_scripts_failed = null;
+        assertions_failed = null;
+        iterations_failed = null;
+        requests_failed = null;
     }
-      
-    
-     public void setTestWithoutLogin(String collectionName) throws IOException{
-     
-        if(path.validateDir())
-       for(File f : path.getFiles()){
-           cb = new CollectionBuilder(f);
-           if(cb.isCollection(collectionName)){      
-             coll = coll.concat(path.getPATH().concat("\\").concat(cb.getOriginalName()));
-           } /* else {
+
+    public void setTestWithoutLogin(String collectionName) throws IOException {
+
+        if (path.validateDir()) {
+            for (File f : path.getFiles()) {
+                cb = new CollectionBuilder(f);
+                if (cb.isCollection(collectionName)) {
+                    coll = coll.concat(path.getPATH().concat("\\").concat(cb.getOriginalName()));
+                }
+                /* else {
              throw new IOException();
            } */
-       }
-        tmp = File.createTempFile(collectionName, ".bat");
-        bw = new BufferedWriter(new FileWriter(tmp));
-    	    bw.write(coll.concat(" --disable-unicode"));
-            bw.close();
-            tmp.setExecutable(true);
-            startProcess();
-    }
-     
-      public void setTestWithoutLogin(String collectionName,String environmentName) throws IOException{
-     
-        if(path.validateDir())
-       for(File f : path.getFiles()){
-           cb = new CollectionBuilder(f);
-         
-          if(cb.isEnvironment(environmentName))
-            env = env.concat(path.getPATH().concat("\\").concat(cb.getOriginalName()+" --disable-unicode"));
-         // else
-         //     throw new IOException();
-          if(cb.isCollection(collectionName)){
-              
-             coll = coll.concat(path.getPATH().concat("\\").concat(cb.getOriginalName()));
-          }//    else
-        //      throw new IOException();
-       }
-        tmp = File.createTempFile(collectionName, ".bat");
-        
-        bw = new BufferedWriter(new FileWriter(tmp));
-    	    bw.write(coll.concat(env));
-            bw.close();
-            tmp.setExecutable(true);
-            startProcess();
-    }
-        private void startProcess(){
-            
-        try {              
-             process = Runtime.getRuntime().exec(tmp.getAbsolutePath());
-             inputStream = process.getInputStream();
-             bf= new BufferedReader(new InputStreamReader(inputStream));
-    
-            while ((ln=bf.readLine()) != null) {
-                line=line.concat(ln+"\n");
-                if(ln.contains("requests")){
-                if(!"0".equals(ln.substring(27, 37).trim()))
-                requests_failed = ln.substring(38, 48).trim();
-                }
-                if(ln.contains("assertions")){
-                if(!"0".equals(ln.substring(27, 37).trim()))
-                assertions_failed = ln.substring(38, 48).trim();
-                }
-                if(ln.contains("iterations")){
-                if(!"0".equals(ln.substring(27, 37).trim()))
-                iterations_failed = ln.substring(38, 48).trim();
-                }
-                 if(ln.contains("test-scripts")){
-                if(!"0".equals(ln.substring(27, 37).trim()))
-                test_scripts_failed = ln.substring(38, 48).trim();
-                }
-                  if(ln.contains("prerequest-scripts")){
-                if(!"0".equals(ln.substring(27, 37).trim()))
-                prerequest_scripts_failed = ln.substring(38, 48).trim();
-                }
-      
             }
-            
-              System.out.println(line);   
-              
+        }
+        tmp = File.createTempFile(collectionName, ".bat");
+        bw = new BufferedWriter(new FileWriter(tmp));
+        bw.write(coll.concat(" --disable-unicode"));
+        bw.close();
+        tmp.setExecutable(true);
+        startProcess();
+    }
+
+    public void setTestWithoutLogin(String collectionName, String environmentName) throws IOException {
+
+        if (path.validateDir()) {
+            for (File f : path.getFiles()) {
+                cb = new CollectionBuilder(f);
+
+                if (cb.isEnvironment(environmentName)) {
+                    env = env.concat(path.getPATH().concat("\\").concat(cb.getOriginalName() + " --disable-unicode"));
+                }
+                // else
+                //     throw new IOException();
+                if (cb.isCollection(collectionName)) {
+
+                    coll = coll.concat(path.getPATH().concat("\\").concat(cb.getOriginalName()));
+                }//    else
+                //      throw new IOException();
+            }
+        }
+        tmp = File.createTempFile(collectionName, ".bat");
+
+        bw = new BufferedWriter(new FileWriter(tmp));
+        bw.write(coll.concat(env));
+        bw.close();
+        tmp.setExecutable(true);
+        startProcess();
+    }
+
+    private void startProcess() {
+
+        try {
+            process = Runtime.getRuntime().exec(tmp.getAbsolutePath());
+            inputStream = process.getInputStream();
+            bf = new BufferedReader(new InputStreamReader(inputStream));
+
+            while ((ln = bf.readLine()) != null) {
+                line = line.concat(ln + "\n");
+
+                if (ln.contains("requests")) {
+                    if (!"        0 ".equals(ln.substring(52, 68))) {
+                        requests_failed = ln.substring(73, 89);
+                    }
+                }
+                if (ln.contains("assertions")) {
+                    if (!"        0 ".equals(ln.substring(52, 68))) {
+                        assertions_failed = ln.substring(73, 89);
+                    }
+                }
+                if (ln.contains("iterations")) {
+                    if (!"        0 ".equals(ln.substring(52, 68))) {
+                        iterations_failed = ln.substring(73, 89);
+                    }
+                }
+                if (ln.contains("test-scripts")) {
+                    if (!"        0 ".equals(ln.substring(52, 68))) {
+                        test_scripts_failed = ln.substring(73, 89);
+                    }
+                }
+                if (ln.contains("prerequest-scripts")) {
+                    if (!"        0 ".equals(ln.substring(52, 68))) {
+                        prerequest_scripts_failed = ln.substring(73, 89);
+                    }
+                }
+            }
+
+            System.out.println(line);
+
             inputStream.close();
             bf.close();
         } catch (IOException ioe) {
             ioe.printStackTrace();
-        }       
-    tmp.deleteOnExit();
+        }
+        tmp.deleteOnExit();
     }
+
     /**
      * @return the requests_failed
      */
