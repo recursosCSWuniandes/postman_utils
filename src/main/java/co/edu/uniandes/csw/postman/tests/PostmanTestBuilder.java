@@ -14,7 +14,6 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.logging.Logger;
 
 /**
  *
@@ -22,7 +21,6 @@ import java.util.logging.Logger;
  */
 public class PostmanTestBuilder {
 
-    private static final Logger LOGGER = Logger.getLogger(PostmanTestBuilder.class.getName());
     private String env;
     private String coll;
     private PathBuilder path;
@@ -37,6 +35,7 @@ public class PostmanTestBuilder {
     private String assertions_failed;
     private String test_scripts_failed;
     private String prerequest_scripts_failed;
+    private String total_requests;
     private File tmp;
     private BufferedWriter bw;
 
@@ -51,6 +50,7 @@ public class PostmanTestBuilder {
         assertions_failed = null;
         iterations_failed = null;
         requests_failed = null;
+        total_requests = null;
     }
 
     public void setTestWithoutLogin(String collectionName) throws IOException {
@@ -61,9 +61,6 @@ public class PostmanTestBuilder {
                 if (cb.isCollection(collectionName)) {
                     coll = coll.concat(path.getPATH().concat("\\").concat(cb.getOriginalName()));
                 }
-                /* else {
-             throw new IOException();
-           } */
             }
         }
         tmp = File.createTempFile(collectionName, ".bat");
@@ -83,13 +80,10 @@ public class PostmanTestBuilder {
                 if (cb.isEnvironment(environmentName)) {
                     env = env.concat(path.getPATH().concat("\\").concat(cb.getOriginalName() + " --disable-unicode"));
                 }
-                // else
-                //     throw new IOException();
                 if (cb.isCollection(collectionName)) {
 
                     coll = coll.concat(path.getPATH().concat("\\").concat(cb.getOriginalName()));
-                }//    else
-                //      throw new IOException();
+                }
             }
         }
         tmp = File.createTempFile(collectionName, ".bat");
@@ -112,7 +106,8 @@ public class PostmanTestBuilder {
                 line = line.concat(ln + "\n");
 
                 if (ln.contains("requests")) {
-                    if (!"        0 ".equals(ln.substring(52, 68))) {
+                    total_requests = ln.substring(52, 68);
+                    if (!"        0 ".equals(total_requests)) {
                         requests_failed = ln.substring(73, 89);
                     }
                 }
@@ -181,5 +176,12 @@ public class PostmanTestBuilder {
      */
     public String getPrerequest_scripts_failed() {
         return prerequest_scripts_failed;
+    }
+
+    /**
+     * @return the total_requests
+     */
+    public String getTotal_Requests() {
+        return total_requests;
     }
 }
